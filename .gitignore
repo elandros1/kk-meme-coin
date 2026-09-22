@@ -1,0 +1,24 @@
+# 私钥和敏感信息
+.env
+.env.local
+deploy-info.json
+
+# 依赖
+node_modules/
+
+# 编译产物
+artifacts/
+cache/
+typechain-types/
+
+# 日志
+*.log
+npm-debug.log*
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 编辑器
+.vscode/
+.idea/
