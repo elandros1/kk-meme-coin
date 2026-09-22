@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,7 @@
             color: #fff;
         }
         .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        
+
         .hero {
             text-align: center;
             padding: 60px 20px;
@@ -27,7 +27,7 @@
         }
         @keyframes shine { to { background-position: 200% center; } }
         .hero p { font-size: 1.4rem; opacity: 0.9; margin-top: 10px; }
-        
+
         .card {
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
@@ -36,12 +36,12 @@
             margin: 20px 0;
             border: 1px solid rgba(255,255,255,0.2);
         }
-        
+
         .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }
         .stat { text-align: center; }
         .stat .num { font-size: 1.8rem; font-weight: bold; color: #ffd60a; }
         .stat .label { font-size: 0.85rem; opacity: 0.7; }
-        
+
         .btn {
             display: inline-block;
             padding: 14px 40px;
@@ -56,12 +56,12 @@
             text-decoration: none;
         }
         .btn:hover { transform: scale(1.05); }
-        
+
         .features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         .feature { padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; }
         .feature h3 { color: #ffd60a; margin-bottom: 5px; }
         .feature p { font-size: 0.9rem; opacity: 0.8; }
-        
+
         .contract-info {
             font-family: monospace;
             font-size: 0.85rem;
@@ -71,13 +71,13 @@
             border-radius: 10px;
             margin-top: 10px;
         }
-        
+
         .connect-btn {
             position: fixed;
             top: 20px;
             right: 20px;
         }
-        
+
         #toast {
             position: fixed;
             bottom: 20px;
@@ -92,15 +92,15 @@
     </style>
 </head>
 <body>
-    <button class="btn connect-btn" id="connectBtn">连接钱包</button>
-    
+    <button class="btn connect-btn" id="connectBtn">Connect Wallet</button>
+
     <div class="container">
         <div class="hero">
             <h1>KK</h1>
             <p>The Meme Coin That Says KK to Everything</p>
             <a href="#" class="btn" id="buyBtn">Buy KK</a>
         </div>
-        
+
         <div class="card">
             <h2>Tokenomics</h2>
             <div class="stats">
@@ -118,84 +118,84 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="card">
             <h2>Features</h2>
             <div class="features">
                 <div class="feature">
                     <h3>Anti-Whale</h3>
-                    <p>单笔交易上限 1%, 单地址上限 3%</p>
+                    <p>Max 1% per transaction, max 3% per wallet holding</p>
                 </div>
                 <div class="feature">
                     <h3>Tax System</h3>
-                    <p>买 2% 卖 3%, 60% 营销 + 40% LP</p>
+                    <p>Buy 2% / Sell 3%, 60% marketing + 40% LP</p>
                 </div>
                 <div class="feature">
                     <h3>Mintable</h3>
-                    <p>Owner 可按需增发代币</p>
+                    <p>Owner can mint additional supply as needed</p>
                 </div>
                 <div class="feature">
                     <h3>Burnable</h3>
-                    <p>任何持有者可销毁自己的代币</p>
+                    <p>Any holder can burn their own tokens</p>
                 </div>
                 <div class="feature">
                     <h3>Pausable</h3>
-                    <p>紧急情况可暂停所有交易</p>
+                    <p>Emergency pause for all trading activity</p>
                 </div>
                 <div class="feature">
                     <h3>Rescue</h3>
-                    <p>误转入的代币/ETH 可由 Owner 提取</p>
+                    <p>Recover accidentally sent tokens/ETH</p>
                 </div>
             </div>
         </div>
-        
+
         <div class="card">
             <h2>Contract</h2>
-            <p>部署后在此显示合约地址</p>
-            <div class="contract-info" id="contractAddress">部署后更新</div>
+            <p>Contract address will be shown here after deployment</p>
+            <div class="contract-info" id="contractAddress">Update after deployment</div>
         </div>
     </div>
-    
+
     <div id="toast"></div>
-    
+
     <script>
         const CONTRACT_ADDRESS = 'YOUR_CONTRACT_ADDRESS';
         const ABI = [{"inputs":[{"internalType":"address","name":"_marketingWallet","type":"address"},{"internalType":"address","name":"_lpWallet","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"MAX_TAX","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"TOTAL_SUPPLY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"buyTax","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"sellTax","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}];
-        
+
         let provider, signer, contract;
-        
+
         async function connect() {
             if (typeof window.ethereum === 'undefined') {
-                showToast('请安装 MetaMask');
+                showToast('Please install MetaMask');
                 return;
             }
             try {
                 const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
                 provider = new ethers.BrowserProvider(window.ethereum);
                 signer = await provider.getSigner();
-                
+
                 document.getElementById('connectBtn').textContent = accounts[0].slice(0,6) + '...' + accounts[0].slice(-4);
-                
+
                 if (CONTRACT_ADDRESS !== 'YOUR_CONTRACT_ADDRESS') {
                     contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
                     document.getElementById('contractAddress').textContent = CONTRACT_ADDRESS;
                 }
-                showToast('钱包已连接');
+                showToast('Wallet connected');
             } catch (e) {
-                showToast('连接失败: ' + e.message);
+                showToast('Connection failed: ' + e.message);
             }
         }
-        
+
         function showToast(msg) {
             const t = document.getElementById('toast');
             t.textContent = msg;
             t.style.display = 'block';
             setTimeout(() => t.style.display = 'none', 3000);
         }
-        
+
         document.getElementById('connectBtn').addEventListener('click', connect);
         document.getElementById('buyBtn').addEventListener('click', () => {
-            showToast('请在 Uniswap 上用合约地址购买 KK');
+            showToast('Please buy KK on Uniswap using the contract address');
         });
     </script>
     <script src="https://cdn.ethers.io/lib/ethers-6.2.umd.min.js"></script>

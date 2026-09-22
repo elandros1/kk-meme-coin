@@ -2,121 +2,121 @@
 
 > The Meme Coin That Says KK to Everything
 
-## 概述
+## Overview
 
-KK 是一个基于以太坊 ERC-20 标准的 Meme 币智能合约，内置防鲸鱼机制、交易税系统和紧急暂停功能。
+KK is an ERC-20 meme coin on Ethereum with built-in anti-whale mechanisms, transaction tax system, and emergency pause functionality.
 
 ## Tokenomics
 
-| 参数 | 值 |
-|------|------|
-| 名称 | KK |
-| 符号 | KK |
-| 总供应量 | 1,000,000,000,000 (1万亿) |
-| 买入税 | 2% |
-| 卖出税 | 3% |
-| 单笔交易上限 | 总供应量的 1% |
-| 单地址持有上限 | 总供应量的 3% |
-| 税收分配 | 60% 营销 + 40% LP |
+| Parameter | Value |
+|-----------|-------|
+| Name | KK |
+| Symbol | KK |
+| Total Supply | 1,000,000,000,000 (1 Trillion) |
+| Buy Tax | 2% |
+| Sell Tax | 3% |
+| Max Transaction | 1% of total supply |
+| Max Wallet Holding | 3% of total supply |
+| Tax Distribution | 60% Marketing + 40% LP |
 
-## 运行机制
+## Mechanism
 
-### 1. 防鲸鱼机制 (Anti-Whale)
-- **单笔交易上限**: 1% 总供应量 = 100亿 KK，防止单笔大额砸盘
-- **单地址持有上限**: 3% 总供应量 = 300亿 KK，防止过度集中
-- AMM 池地址不受钱包上限约束（流动性提供需要）
+### 1. Anti-Whale
+- **Max transaction amount**: 1% of total supply = 10 billion KK, prevents large single-trade dumps
+- **Max wallet holding**: 3% of total supply = 30 billion KK, prevents over-concentration
+- AMM pool addresses are exempt from wallet limit (liquidity provision requires it)
 
-### 2. 交易税系统
-- **买入税 2%**: 从 AMM 池买入时自动扣除
-- **卖出税 3%**: 卖出到 AMM 池时自动扣除
-- **税收去向**: 60% 进入营销钱包用于推广，40% 进入 LP 钱包用于流动性管理
-- Owner 可随时调整税率（上限 10%）
-- 支持设置免税地址（团队、合作伙伴）
+### 2. Transaction Tax
+- **Buy tax 2%**: Auto-deducted when buying from AMM pool
+- **Sell tax 3%**: Auto-deducted when selling to AMM pool
+- **Tax distribution**: 60% goes to marketing wallet for promotion, 40% goes to LP wallet for liquidity management
+- Owner can adjust tax rates at any time (max 10%)
+- Supports fee-exempt addresses (team, partners)
 
-### 3. 铸造与销毁
-- **Mint**: Owner 可按需增发代币，用于流动性池或社区奖励
-- **Burn**: 任何持有者可销毁自己的代币，减少流通量
+### 3. Mintable & Burnable
+- **Mint**: Owner can mint additional tokens for liquidity pools or community rewards
+- **Burn**: Any holder can burn their own tokens to reduce circulating supply
 
-### 4. 暂停机制
-- 紧急情况下 Owner 可暂停所有转账
-- 用于应对攻击或异常交易
+### 4. Pausable
+- Owner can pause all transfers in emergencies
+- Used to respond to attacks or abnormal trading activity
 
-### 5. 资产回收
-- 误转入合约的 ETH 和 ERC-20 可由 Owner 提取
+### 5. Asset Recovery
+- Accidentally sent ETH and ERC-20 tokens can be rescued by owner
 
-## 快速开始
+## Quick Start
 
-### 安装依赖
+### Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 编译合约
+### Compile Contract
 
 ```bash
 npx hardhat compile
 ```
 
-### 运行测试
+### Run Tests
 
 ```bash
 npx hardhat test
 ```
 
-### 部署到 Sepolia 测试网
+### Deploy to Sepolia Testnet
 
-1. 复制 `.env.example` 为 `.env` 并填写:
+1. Copy `.env.example` to `.env` and fill in:
 ```env
-PRIVATE_KEY=你的私钥
-SEPOLIA_RPC_URL=你的Sepolia RPC URL
-MARKETING_WALLET=营销钱包地址
-LP_WALLET=LP钱包地址
-ETHERSCAN_API_KEY=用于验证
+PRIVATE_KEY=your_private_key
+SEPOLIA_RPC_URL=your_sepolia_rpc_url
+MARKETING_WALLET=marketing_wallet_address
+LP_WALLET=lp_wallet_address
+ETHERSCAN_API_KEY=for_verification
 ```
 
-2. 执行部署:
+2. Run deployment:
 ```bash
 npx hardhat run scripts/deploy.js --network sepolia
 ```
 
-3. 部署后配置 AMM 池:
+3. Post-deployment configuration:
 ```bash
 npx hardhat run scripts/post-deploy.js --network sepolia
 ```
 
-### 验证合约
+### Verify Contract
 
 ```bash
-npx hardhat verify --network sepolia <合约地址> <营销钱包> <LP钱包>
+npx hardhat verify --network sepolia <contract_address> <marketing_wallet> <lp_wallet>
 ```
 
-## 合约结构
+## Project Structure
 
 ```
 contracts/
-├── KKToken.sol          # 主合约
+├── KKToken.sol          # Main contract
 └── mocks/
-    └── WETH9.sol        # 测试用 WETH
+    └── WETH9.sol        # WETH mock for testing
 
 scripts/
-├── deploy.js            # 部署脚本
-└── post-deploy.js       # 部署后配置
+├── deploy.js            # Deployment script
+└── post-deploy.js       # Post-deployment configuration
 
 test/
-└── KKToken.test.js      # 测试用例
+└── KKToken.test.js      # Test suite
 
 frontend/
-└── index.html           # DApp 前端页面
+└── index.html           # DApp frontend page
 ```
 
-## 安全特性
+## Security Features
 
-- **ReentrancyGuard**: 防止重入攻击
-- **Ownable**: 关键操作仅限 Owner
-- **税率上限**: 硬编码 10% 上限，防止恶意修改
-- **零地址检查**: 所有关键地址参数检查非零
-- **OpenZeppelin**: 基于 OZ v5 审计过的基础合约
+- **ReentrancyGuard**: Prevents reentrancy attacks
+- **Ownable**: Critical operations restricted to owner
+- **Tax rate cap**: Hardcoded 10% maximum prevents malicious changes
+- **Zero address check**: All key address parameters checked against zero
+- **OpenZeppelin**: Built on OZ v5 audited base contracts
 
 ## License
 

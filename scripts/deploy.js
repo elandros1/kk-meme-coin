@@ -1,47 +1,47 @@
 const { ethers } = require("hardhat");
 
 /**
- * KK Meme 币部署脚本
- * 
- * 部署前需要:
- * 1. 在 .env 中配置 PRIVATE_KEY 和 SEPOLIA_RPC_URL
- * 2. 准备营销钱包和 LP 钱包地址
- * 3. 确保有足够 ETH 支付 gas
+ * KK Meme Coin Deployment Script
+ *
+ * Prerequisites:
+ * 1. Configure PRIVATE_KEY and SEPOLIA_RPC_URL in .env
+ * 2. Prepare marketing wallet and LP wallet addresses
+ * 3. Ensure sufficient ETH for gas
  */
 async function main() {
   const [deployer] = await ethers.getSigners();
-  console.log("部署账户:", deployer.address);
-  
-  const balance = await ethers.provider.getBalance(deployer.address);
-  console.log("账户余额:", ethers.formatEther(balance), "ETH");
+  console.log("Deploying from account:", deployer.address);
 
-  // 配置参数 - 部署前修改
+  const balance = await ethers.provider.getBalance(deployer.address);
+  console.log("Account balance:", ethers.formatEther(balance), "ETH");
+
+  // Configuration - modify before deployment
   const marketingWallet = process.env.MARKETING_WALLET || deployer.address;
   const lpWallet = process.env.LP_WALLET || deployer.address;
 
-  console.log("营销钱包:", marketingWallet);
-  console.log("LP 钱包:", lpWallet);
-  console.log("\n开始部署 KKToken...");
+  console.log("Marketing wallet:", marketingWallet);
+  console.log("LP wallet:", lpWallet);
+  console.log("\nDeploying KKToken...");
 
-  // 部署合约
+  // Deploy contract
   const KKToken = await ethers.getContractFactory("KKToken");
   const kk = await KKToken.deploy(marketingWallet, lpWallet);
-  
-  console.log("等待确认...");
-  await kk.waitForDeployment();
-  
-  const kkAddress = await kk.getAddress();
-  console.log("\n====== 部署成功 ======");
-  console.log("合约地址:", kkAddress);
-  console.log("代币名称:", await kk.name());
-  console.log("代币符号:", await kk.symbol());
-  console.log("总供应量:", ethers.formatEther(await kk.totalSupply()), "KK");
-  console.log("买入税:", await kk.buyTax(), "%");
-  console.log("卖出税:", await kk.sellTax(), "%");
-  console.log("单笔上限:", ethers.formatEther(await kk.maxTxAmount()), "KK");
-  console.log("钱包上限:", ethers.formatEther(await kk.maxWalletAmount()), "KK");
 
-  // 保存部署信息
+  console.log("Waiting for confirmation...");
+  await kk.waitForDeployment();
+
+  const kkAddress = await kk.getAddress();
+  console.log("\n====== Deployment Successful ======");
+  console.log("Contract address:", kkAddress);
+  console.log("Token name:", await kk.name());
+  console.log("Token symbol:", await kk.symbol());
+  console.log("Total supply:", ethers.formatEther(await kk.totalSupply()), "KK");
+  console.log("Buy tax:", await kk.buyTax(), "%");
+  console.log("Sell tax:", await kk.sellTax(), "%");
+  console.log("Max tx amount:", ethers.formatEther(await kk.maxTxAmount()), "KK");
+  console.log("Max wallet amount:", ethers.formatEther(await kk.maxWalletAmount()), "KK");
+
+  // Save deployment info
   const fs = require("fs");
   const network = await ethers.provider.getNetwork();
   const deployInfo = {
@@ -56,11 +56,11 @@ async function main() {
     abi: JSON.parse(JSON.stringify(KKToken.interface.formatJson())),
   };
   fs.writeFileSync("deploy-info.json", JSON.stringify(deployInfo, null, 2));
-  console.log("\n部署信息已保存到 deploy-info.json");
-  
-  // Etherscan 验证提示
+  console.log("\nDeployment info saved to deploy-info.json");
+
+  // Etherscan verification prompt
   if (network.chainId !== 31337) {
-    console.log("\n验证合约命令:");
+    console.log("\nVerify contract command:");
     console.log(`npx hardhat verify --network ${network.name} ${kkAddress} ${marketingWallet} ${lpWallet}`);
   }
 }
@@ -68,6 +68,6 @@ async function main() {
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error("部署失败:", error);
+    console.error("Deployment failed:", error);
     process.exit(1);
   });
